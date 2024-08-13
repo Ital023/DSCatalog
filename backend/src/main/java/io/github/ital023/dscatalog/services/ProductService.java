@@ -1,8 +1,11 @@
 package io.github.ital023.dscatalog.services;
 
 
+import io.github.ital023.dscatalog.dto.CategoryDTO;
 import io.github.ital023.dscatalog.dto.ProductDTO;
+import io.github.ital023.dscatalog.entities.Category;
 import io.github.ital023.dscatalog.entities.Product;
+import io.github.ital023.dscatalog.repositories.CategoryRepository;
 import io.github.ital023.dscatalog.repositories.ProductRepository;
 import io.github.ital023.dscatalog.services.exceptions.DataBaseException;
 import io.github.ital023.dscatalog.services.exceptions.ResourceNotFoundException;
@@ -23,6 +26,9 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     @Transactional(readOnly = true)
     public ProductDTO getById(Long id) {
         Optional<Product> obj = productRepository.findById(id);
@@ -34,7 +40,8 @@ public class ProductService {
     @Transactional
     public ProductDTO insert(ProductDTO productDTO) {
         Product entity = new Product();
-        entity.setName(productDTO.getName());
+
+        copyDtoToEntity(productDTO, entity);
 
         entity = productRepository.save(entity);
 
@@ -45,7 +52,7 @@ public class ProductService {
     public ProductDTO update(Long id, ProductDTO productDTO) {
         try{
             Product entity = productRepository.getReferenceById(id);
-            entity.setName(productDTO.getName());
+            copyDtoToEntity(productDTO, entity);
 
             productRepository.save(entity);
 
@@ -73,6 +80,20 @@ public class ProductService {
     public Page<ProductDTO> findAllPaged(PageRequest pageRequest) {
         Page<Product> list = productRepository.findAll(pageRequest);
         return list.map(x -> new ProductDTO(x));
+    }
+
+    private void copyDtoToEntity(ProductDTO dto, Product entity){
+        entity.setName(dto.getName());
+        entity.setDate(dto.getDate());
+        entity.setDescription(dto.getDescription());
+        entity.setPrice(dto.getPrice());
+        entity.setImgUrl(dto.getImgUrl());
+
+        entity.getCategories().clear();
+        for(CategoryDTO catDTO : dto.getCategories()){
+            Category category = categoryRepository.getReferenceById(catDTO.getId());
+            entity.getCategories().add(category);
+        }
     }
 
 }
