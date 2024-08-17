@@ -1,7 +1,6 @@
 package io.github.ital023.dscatalog.repositories;
 
 import io.github.ital023.dscatalog.entities.Product;
-import io.github.ital023.dscatalog.services.exceptions.ResourceNotFoundException;
 import io.github.ital023.dscatalog.tests.Factory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,12 +16,14 @@ public class ProductRepositoryTests {
     @Autowired
     private ProductRepository repository;
 
-    private long existId;
+    private long existingId;
+    private long nonExistingId;
     private long countTotalProducts;
 
     @BeforeEach
     void setUp() throws Exception {
-        existId = 1L;
+        existingId = 1L;
+        nonExistingId = 1000000L;
         countTotalProducts = 25L;
     }
 
@@ -39,14 +40,32 @@ public class ProductRepositoryTests {
     }
 
     @Test
+    public void findByIdShouldReturnProductWhenIdExists(){
+        //ACT
+        Optional<Product> product = repository.findById(existingId);
+
+        //ASSERT
+        Assertions.assertTrue(product.isPresent());
+    }
+
+    @Test
+    public void findByIShouldDoNotReturnProductWhenIdDoesNotExists(){
+        //ACT
+        Optional<Product> product = repository.findById(nonExistingId);
+
+        //ASSERT
+        Assertions.assertFalse(product.isPresent());
+    }
+
+    @Test
     public void deleteShouldDeleteObjectWhenIdExist(){
         //Arrange
 
         //Act
-        repository.deleteById(existId);
+        repository.deleteById(existingId);
 
         //Assert
-        Optional<Product> result = repository.findById(existId);
+        Optional<Product> result = repository.findById(existingId);
         Assertions.assertFalse(result.isPresent());
     }
 
