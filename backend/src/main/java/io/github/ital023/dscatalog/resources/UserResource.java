@@ -4,6 +4,7 @@ package io.github.ital023.dscatalog.resources;
 import io.github.ital023.dscatalog.dto.ProductDTO;
 import io.github.ital023.dscatalog.dto.UserDTO;
 import io.github.ital023.dscatalog.dto.UserInsertDTO;
+import io.github.ital023.dscatalog.dto.UserUpdateDTO;
 import io.github.ital023.dscatalog.entities.User;
 import io.github.ital023.dscatalog.services.ProductService;
 import io.github.ital023.dscatalog.services.UserService;
@@ -48,10 +49,10 @@ public class UserResource {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<UserDTO> update(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO){
-        userDTO = userService.update(id, userDTO);
+    public ResponseEntity<UserDTO> update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO dto){
+        UserDTO newDto = userService.update(id, dto);
 
-        return ResponseEntity.ok(userDTO);
+        return ResponseEntity.ok(newDto);
     }
 
     @DeleteMapping(value = "/{id}")
