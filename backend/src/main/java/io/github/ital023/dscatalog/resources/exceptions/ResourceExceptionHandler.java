@@ -5,6 +5,7 @@ import io.github.ital023.dscatalog.services.exceptions.ResourceNotFoundException
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -39,6 +40,22 @@ public class ResourceExceptionHandler {
                         , "Resource Not Found"
                         , e.getMessage()
                         , request.getRequestURI());
+
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<StandartError> validation(MethodArgumentNotValidException e,
+                                                                         HttpServletRequest request) {
+
+        HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+
+        StandartError err = new StandartError(Instant.now(),
+                    status.value(),
+                    "Validation error",
+                    e.getMessage(),
+                request.getRequestURI()
+                );
 
         return ResponseEntity.status(status).body(err);
     }
