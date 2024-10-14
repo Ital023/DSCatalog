@@ -2,12 +2,16 @@ package io.github.ital023.dscatalog.dto;
 
 import io.github.ital023.dscatalog.entities.User;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class UserDTO {
 
     private Long id;
     private String firstName;
     private String lastName;
     private String email;
+    Set<RoleDTO> roles = new HashSet<>();
 
     public UserDTO() {
     }
@@ -24,6 +28,7 @@ public class UserDTO {
         this.firstName = entity.getFirstName();
         this.lastName = entity.getLastName();
         this.email = entity.getEmail();
+        entity.getRoles().forEach(role -> this.roles.add(new RoleDTO(role)));
     }
 
     public Long getId() {
@@ -58,4 +63,7 @@ public class UserDTO {
         this.email = email;
     }
 
+    public Set<RoleDTO> getRoles() {
+        return roles;
+    }
 }
