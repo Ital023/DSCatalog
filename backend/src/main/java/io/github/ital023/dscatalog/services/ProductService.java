@@ -5,6 +5,7 @@ import io.github.ital023.dscatalog.dto.CategoryDTO;
 import io.github.ital023.dscatalog.dto.ProductDTO;
 import io.github.ital023.dscatalog.entities.Category;
 import io.github.ital023.dscatalog.entities.Product;
+import io.github.ital023.dscatalog.projetions.ProductProjection;
 import io.github.ital023.dscatalog.repositories.CategoryRepository;
 import io.github.ital023.dscatalog.repositories.ProductRepository;
 import io.github.ital023.dscatalog.services.exceptions.DataBaseException;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -96,5 +99,11 @@ public class ProductService {
             entity.getCategories().add(category);
         }
     }
+
+    @Transactional(readOnly = true)
+    public Page<ProductProjection> testQuery(Pageable pageable) {
+        return productRepository.searchProducts(Arrays.asList(1L, 3L), "ma", pageable);
+    }
+
 
 }
