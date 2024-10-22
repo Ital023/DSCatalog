@@ -16,7 +16,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             SELECT DISTINCT TB_PRODUCT.id, TB_PRODUCT.name
             FROM TB_PRODUCT
             INNER JOIN TB_PRODUCT_CATEGORY ON TB_PRODUCT.id =  TB_PRODUCT_CATEGORY.product_id
-            WHERE TB_PRODUCT_CATEGORY.category_id IN :categoryIds
+            WHERE (:categoryIds IS NULL OR TB_PRODUCT_CATEGORY.category_id IN :categoryIds)
             AND LOWER(TB_PRODUCT.name) LIKE LOWER(CONCAT('%',:name, '%'))
             ORDER BY TB_PRODUCT.name
             """, countQuery = """
@@ -24,7 +24,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             SELECT DISTINCT TB_PRODUCT.id, TB_PRODUCT.name
             FROM TB_PRODUCT
             INNER JOIN TB_PRODUCT_CATEGORY ON TB_PRODUCT.id =  TB_PRODUCT_CATEGORY.product_id
-            WHERE TB_PRODUCT_CATEGORY.category_id IN :categoryIds
+            WHERE (:categoryIds IS NULL OR TB_PRODUCT_CATEGORY.category_id IN :categoryIds)
             AND LOWER(TB_PRODUCT.name) LIKE LOWER(CONCAT('%',:name, '%'))
             ORDER BY TB_PRODUCT.name
             ) AS tb_result
