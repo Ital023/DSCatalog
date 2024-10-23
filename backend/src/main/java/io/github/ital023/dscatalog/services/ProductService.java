@@ -101,8 +101,15 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ProductProjection> testQuery(Pageable pageable) {
-        return productRepository.searchProducts(Arrays.asList(), "", pageable);
+    public Page<ProductProjection> findAllPaged(String name, String categoryId, Pageable pageable) {
+
+        String[] vet = categoryId.split(",");
+        List<String> list = Arrays.asList(vet);
+        List<Long> categoryIds = Arrays.asList();
+
+        if(!"0".equals(categoryId)) categoryIds = list.stream().map(x -> Long.parseLong(x)).toList();
+
+        return productRepository.searchProducts(categoryIds, name, pageable);
     }
 
 
