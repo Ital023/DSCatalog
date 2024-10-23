@@ -10,6 +10,7 @@ import io.github.ital023.dscatalog.repositories.CategoryRepository;
 import io.github.ital023.dscatalog.repositories.ProductRepository;
 import io.github.ital023.dscatalog.services.exceptions.DataBaseException;
 import io.github.ital023.dscatalog.services.exceptions.ResourceNotFoundException;
+import io.github.ital023.dscatalog.util.Utils;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -96,10 +97,12 @@ public class ProductService {
 
         if(!"0".equals(categoryId)) categoryIds = list.stream().map(x -> Long.parseLong(x)).toList();
 
-        Page<ProductProjection> page = productRepository.searchProducts(categoryIds, name, pageable);
+        Page<ProductProjection> page = productRepository.searchProducts(categoryIds, name.trim(), pageable);
         List<Long> productIds = page.map(x -> x.getId()).toList();
 
         List<Product> entities = productRepository.searchProductsWithCategories(productIds);
+
+        entities = Utils.replace(page.getContent(), entities);
 
         List<ProductDTO> dtos = entities.stream().map(p -> new ProductDTO(p, p.getCategories())).toList();
 
