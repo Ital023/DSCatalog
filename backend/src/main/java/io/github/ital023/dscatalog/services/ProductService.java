@@ -14,6 +14,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -86,6 +87,27 @@ public class ProductService {
         return list.map(x -> new ProductDTO(x));
     }
 
+    @Transactional(readOnly = true)
+    public Page<ProductDTO> findAllPaged(String name, String categoryId, Pageable pageable) {
+
+        String[] vet = categoryId.split(",");
+        List<String> list = Arrays.asList(vet);
+        List<Long> categoryIds = Arrays.asList();
+
+        if(!"0".equals(categoryId)) categoryIds = list.stream().map(x -> Long.parseLong(x)).toList();
+
+        Page<ProductProjection> page = productRepository.searchProducts(categoryIds, name, pageable);
+        List<Long> productIds = page.map(x -> x.getId()).toList();
+
+        List<Product> entities = productRepository.searchProductsWithCategories(productIds);
+
+        List<ProductDTO> dtos = entities.stream().map(p -> new ProductDTO(p, p.getCategories())).toList();
+
+        Page<ProductDTO> pageDto = new PageImpl<>(dtos, page.getPageable(), page.getTotalElements());
+
+        return pageDto;
+    }
+
     private void copyDtoToEntity(ProductDTO dto, Product entity){
         entity.setName(dto.getName());
         entity.setDate(dto.getDate());
@@ -100,17 +122,7 @@ public class ProductService {
         }
     }
 
-    @Transactional(readOnly = true)
-    public Page<ProductProjection> findAllPaged(String name, String categoryId, Pageable pageable) {
 
-        String[] vet = categoryId.split(",");
-        List<String> list = Arrays.asList(vet);
-        List<Long> categoryIds = Arrays.asList();
-
-        if(!"0".equals(categoryId)) categoryIds = list.stream().map(x -> Long.parseLong(x)).toList();
-
-        return productRepository.searchProducts(categoryIds, name, pageable);
-    }
 
 
 }
