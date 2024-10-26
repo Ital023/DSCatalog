@@ -1,6 +1,7 @@
 package io.github.ital023.dscatalog.resources.exceptions;
 
 import io.github.ital023.dscatalog.services.exceptions.DataBaseException;
+import io.github.ital023.dscatalog.services.exceptions.EmailException;
 import io.github.ital023.dscatalog.services.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -62,6 +63,13 @@ public class ResourceExceptionHandler {
             err.addError(f.getField(), f.getDefaultMessage());
         }
 
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(EmailException.class)
+    public ResponseEntity<StandartError> email(EmailException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandartError err = new StandartError(Instant.now(), status.value(),"Email Exception" ,e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
 
